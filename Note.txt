@@ -1,0 +1,5 @@
+1. Init migrate
+migrate create -ext sql -dir db/migration -seq init_schema
+
+2. Access DB Docker
+docker exec -t psql{nama container} psql -U admin -d simple_bank {nama table}
