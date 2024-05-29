@@ -5,22 +5,28 @@ import (
 	"database/sql"
 )
 
+type Store interface {
+	Querier
+	TransferTx(ctx context.Context, arg TransferTxParams) (TransferTxResult, error)
+}
+
+
 // Store menyediakan semua fungsi untuk menjalankan kueri dan transaksi pada database
-type Store struct {
+type SQLStore struct {
 	*Queries
 	db *sql.DB
 }
 
 // NewStore membuat store baru yang akan digunakan untuk mengakses database 
-func NewStore (db *sql.DB) *Store {
-	return &Store{
+func NewStore (db *sql.DB) Store {
+	return &SQLStore{
 		db: db,
 		Queries: New(db),
 	}
 }
 
 // execTx menjalankan transaksi database dan memastikan untuk melakukan rollback jika terjadi error
-func (store *Store) execTx (ctx context.Context, fn func(*Queries) error) error {
+func (store *SQLStore) execTx (ctx context.Context, fn func(*Queries) error) error {
 	tx, err := store.db.BeginTx(ctx, nil)
 	if err != nil {
 		return err
@@ -55,7 +61,7 @@ type TransferTxResult struct {
 }
 
 // TransferTx melakukan transfer antar akun dan mengembalikan hasilnya
-func (store *Store) TransferTx(ctx context.Context, arg TransferTxParams) (TransferTxResult, error) {
+func (store *SQLStore) TransferTx(ctx context.Context, arg TransferTxParams) (TransferTxResult, error) {
 	var result TransferTxResult	
 
 	err := store.execTx(ctx, func(q *Queries) error {

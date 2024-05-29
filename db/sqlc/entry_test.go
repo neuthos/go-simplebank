@@ -2,9 +2,10 @@ package simple_bank
 
 import (
 	"context"
-	"simplebank/util"
 	"testing"
 	"time"
+
+	"github.com/neuthos/go-simplebank/util"
 
 	"github.com/stretchr/testify/require"
 )
